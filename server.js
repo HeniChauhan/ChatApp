@@ -1,3 +1,4 @@
+const Chat = require('./models/chatModel')
 const path = require('path');
 const http = require('http');
 const express = require('express');
@@ -12,6 +13,7 @@ const {
 
 const Project = require('./models/projectModel');
 const User = require('./models/userModel');
+const { Console } = require('console');
 const app = express();
 const server = http.createServer(app);
 const io = socketio(server);
@@ -31,8 +33,8 @@ app.get("/",function(req,res){
      res.render('index',{'projectList':result,'userList':result1});
     })
 })
-
 })
+
 
 app.get("/chat",function(req,res){
       var username= req.query.username;
@@ -84,6 +86,22 @@ io.on('connection', socket => {
   // Listen for chatMessage
   socket.on('chatMessage', msg => {
     const user = getCurrentUser(socket.id);
+    // console.log(msg);
+    // console.log(user.username);
+    // console.log(user.room);
+    // console.log(formatMessage(user.username, msg));
+    var result=formatMessage(user.username, msg)
+
+  var newChat = new Chat()
+  newChat.username = user.username
+  newChat.msg=msg
+  newChat.time=result.time;
+  newChat.projectName=user.room
+
+  newChat.save(function(err){
+     if(err){throw err}
+     console.log(newChat);
+  })
 
     io.to(user.room).emit('message', formatMessage(user.username, msg));
   });
