@@ -52,11 +52,15 @@ app.get("/chat",function(req,res){
 })
 
 const botName = 'Chat Bot';
-
+const history = [];
+ const client = [];
 // Run when client connects
 io.on('connection', socket => {
   socket.on('joinRoom', ({ username, room }) => {
-
+    client.push({id : socket.client.id})
+   
+  
+    
     console.log(socket.id)
     const user = userJoin(socket.id, username, room);
     //  if(user=='user already exist')
@@ -85,6 +89,10 @@ io.on('connection', socket => {
 
   // Listen for chatMessage
   socket.on('chatMessage', msg => {
+    history.push(msg)
+               console.log(history)
+              
+
     const user = getCurrentUser(socket.id);
     // console.log(msg);
     // console.log(user.username);
